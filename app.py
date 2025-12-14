@@ -6,7 +6,7 @@ import yt_dlp
 import requests
 from flask_cors import CORS
 
-# --- FIX RENDER PATH ---
+# Setup Path Absolut (Supaya tidak nyasar folder)
 base_dir = os.path.abspath(os.path.dirname(__file__))
 template_dir = os.path.join(base_dir, 'templates')
 static_dir = os.path.join(base_dir, 'static')
@@ -14,17 +14,19 @@ static_dir = os.path.join(base_dir, 'static')
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 CORS(app)
 
-# === KONFIGURASI ===
-DOWNLOAD_FOLDER = '/tmp' 
-# PASTIKAN DIGANTI DENGAN TOKEN FONNTE ASLI!
-FONNTE_TOKEN = 'wFH9D48iuCAkkdY9h1AV' 
-NOMOR_ADMIN = '6281227324594' 
+# === KONFIGURASI FOLDER (HUGGING FACE/DOCKER) ===
+DOWNLOAD_FOLDER = '/app/downloads'
 
+# Buat folder jika belum ada
 if not os.path.exists(DOWNLOAD_FOLDER):
     try:
         os.makedirs(DOWNLOAD_FOLDER)
     except:
         pass
+
+# === KONFIGURASI WA (DATA KAMU) ===
+FONNTE_TOKEN = 'wFH9D48iuCAkkdY9h1AV' 
+NOMOR_ADMIN = '6281227324594' 
 
 @app.route('/')
 def home():
@@ -32,16 +34,19 @@ def home():
 
 @app.route('/download', methods=['POST'])
 def process_download():
-    # Bersih-bersih file lama di /tmp (PENTING DI CLOUD GRATIS)
+    # 1. BERSIH-BERSIH FILE LAMA
     try:
         now = time.time()
-        for f in os.listdir(DOWNLOAD_FOLDER):
-            f_path = os.path.join(DOWNLOAD_FOLDER, f)
-            if "nanzz_" in f and os.stat(f_path).st_mtime < now - 180: # Hapus file 3 menit lalu
-                os.remove(f_path)
-    except:
-        pass
+        if os.path.exists(DOWNLOAD_FOLDER):
+            for f in os.listdir(DOWNLOAD_FOLDER):
+                f_path = os.path.join(DOWNLOAD_FOLDER, f)
+                # Hapus file yang umurnya lebih dari 5 menit
+                if os.stat(f_path).st_mtime < now - 300:
+                    os.remove(f_path)
+    except Exception as e:
+        print(f"Warning Cleanup: {e}")
 
+    # 2. PROSES DOWNLOAD
     try:
         data = request.json
         url = data.get('url')
@@ -49,29 +54,39 @@ def process_download():
 
         if not url: return jsonify({'status': 'error', 'message': 'Link kosong!'}), 400
 
+        # Nama file unik
         timestamp = int(time.time())
         filename_base = f"nanzz_{timestamp}"
-        save_path = os.path.join(DOWNLOAD_FOLDER, filename_base)
+        
+        # Path lengkap tujuan simpan
+        save_path_template = os.path.join(DOWNLOAD_FOLDER, filename_base)
 
         ydl_opts = {
-            'outtmpl': save_path + '.%(ext)s',
+            'outtmpl': f"{save_path_template}.%(ext)s",
             'quiet': True,
             'no_warnings': True,
             'nocheckcertificate': True,
-            'cache_dir': False,
-            'format': 'bestaudio/best' if format_type == 'mp3' else 'best[ext=mp4]/best',
         }
+
+        if format_type == 'mp3':
+            ydl_opts.update({'format': 'bestaudio/best'})
+        else:
+            ydl_opts.update({'format': 'best[ext=mp4]/best'})
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
             
-        list_file = glob.glob(os.path.join(DOWNLOAD_FOLDER, f"{filename_base}*"))
-        file_ketemu = [f for f in list_file if not f.endswith('.part')]
+        # 3. CARI FILE HASIL
+        search_pattern = os.path.join(DOWNLOAD_FOLDER, f"{filename_base}*")
+        list_file = glob.glob(search_pattern)
+        
+        file_ketemu = [f for f in list_file if not f.endswith('.part') and not f.endswith('.ytdl')]
         
         if not file_ketemu:
-            return jsonify({'status': 'error', 'message': 'Gagal menyimpan file.'}), 500
+            return jsonify({'status': 'error', 'message': 'File gagal tersimpan di server.'}), 500
             
         final_filename = os.path.basename(file_ketemu[0])
+        
         return jsonify({'status': 'success', 'filename': final_filename})
 
     except Exception as e:
@@ -80,33 +95,37 @@ def process_download():
 @app.route('/get-file/<filename>')
 def get_file(filename):
     try:
-        # Menghapus file setelah dikirim (biar /tmp tidak penuh)
         file_path = os.path.join(DOWNLOAD_FOLDER, filename)
-        response = send_file(file_path, as_attachment=True)
-        # Hapus file setelah response terkirim
-        if os.path.exists(file_path):
-            os.remove(file_path)
-        return response
+        if not os.path.exists(file_path):
+            return "File tidak ditemukan (Mungkin kadaluarsa)", 404
+        return send_file(file_path, as_attachment=True)
     except Exception as e:
-        return f"File tidak ditemukan: {e}", 404
+        return f"Gagal mengambil file: {e}", 404
 
 @app.route('/send-feedback', methods=['POST'])
 def send_feedback():
     try:
         data = request.json
-        pesan = data.get('message', '')
+        pesan_user = data.get('message', '')
         
-        if 'GANTI_TOKEN' in FONNTE_TOKEN:
-            return jsonify({'status': 'error', 'message': 'Token Admin Belum Diisi!'}), 500
+        if not pesan_user:
+            return jsonify({'status': 'error', 'message': 'Pesan kosong'})
 
-        requests.post("https://api.fonnte.com/send", 
-                      headers={'Authorization': FONNTE_TOKEN}, 
-                      data={'target': NOMOR_ADMIN, 'message': f"WEB FEEDBACK: {pesan}"})
+        # Kirim WA via Fonnte
+        pesan_lengkap = f"*📢 FEEDBACK WEB NANZZ*\n\nIsi: {pesan_user}"
+        
+        requests.post(
+            "https://api.fonnte.com/send", 
+            headers={'Authorization': FONNTE_TOKEN}, 
+            data={
+                'target': NOMOR_ADMIN, 
+                'message': pesan_lengkap
+            }
+        )
         return jsonify({'status': 'success'})
-    except Exception as e:
-        # Jika gagal kirim WA (misal token salah), tetap bilang sukses ke user
+    except:
         return jsonify({'status': 'success'})
 
-# Wajib untuk Render.com
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=os.environ.get('PORT', 5000))
+    # Port 7860 wajib untuk Hugging Face
+    app.run(debug=True, host='0.0.0.0', port=7860)
