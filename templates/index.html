@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nanzz Downloader</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.js"></script>
+</head>
+<body class="antialiased">
+
+    <canvas id="particle-canvas"></canvas>
+
+    <a href="https://wa.me/6281227324594" target="_blank" class="wa-float" title="Hubungi Admin">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <div class="min-h-screen flex flex-col items-center justify-center p-4 relative z-10">
+        <div class="glass-panel w-full max-w-lg p-8 relative flex flex-col items-center text-center">
+            
+            <div class="mb-6">
+                <h1 class="brand-title text-6xl font-black mb-1">NANZZ</h1>
+                <div class="downloader-text text-lg uppercase font-bold">DOWNLOADER</div>
+            </div>
+
+            <div id="message" class="alert w-full text-left" style="display: none;"></div>
+
+            <form id="downloadForm" class="w-full relative z-20">
+                <div class="neon-box w-full rounded-lg flex items-center p-2 mb-4">
+                    <div class="px-3 text-gray-400"><i class="fas fa-link"></i></div>
+                    <input type="text" id="urlInput" placeholder="Tempel Link Video (TikTok/IG/YT)..." class="w-full bg-transparent border-none text-white focus:outline-none text-sm p-2" autocomplete="off">
+                </div>
+
+                <div class="w-full mb-6">
+                    <select id="formatSelect" class="neon-box w-full rounded-lg py-3 px-4 text-white bg-black w-full cursor-pointer">
+                        <option value="mp4">Video MP4 (Auto Best)</option>
+                        <option value="mp3">Audio MP3 (Musik)</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="downloadButton" class="btn-cyber w-full py-4 rounded-lg text-lg font-bold shadow-lg mb-4">
+                    DOWNLOAD ⚡
+                </button>
+            </form>
+
+            <div class="flex justify-center gap-6 mb-4 items-center relative z-20">
+                <span class="text-xs mr-2 text-gray-400 font-bold tracking-widest">SUPPORT:</span>
+                
+                <i class="fab fa-tiktok text-2xl brand-tiktok" title="TikTok"></i>
+                
+                <i class="fab fa-youtube text-2xl brand-youtube" title="YouTube"></i>
+                
+                <i class="fab fa-instagram text-2xl brand-instagram" title="Instagram"></i>
+                
+                <i class="fab fa-facebook text-2xl brand-facebook" title="Facebook"></i>
+            </div>
+
+            <div id="downloadLinkContainer" style="display: none; width: 100%; margin-top: 10px;">
+                <p class="text-green-400 text-xs mb-2 font-bold animate-pulse">SUKSES! SILAKAN SIMPAN 👇</p>
+                <a id="finalDownloadLink" class="button-download-final" href="#" download>
+                    <i class="fas fa-save mr-2"></i> SIMPAN FILE SEKARANG
+                </a>
+            </div>
+            
+            <form id="feedbackForm" class="w-full mt-6 pt-6 border-t border-gray-700 relative z-20">
+                <p class="text-xs font-bold text-gray-400 mb-2 uppercase text-left">KRITIK / SARAN</p>
+                <div class="neon-box w-full rounded-xl p-1 mb-3">
+                    <textarea id="feedbackInput" rows="2" placeholder="Tulis pesan..." class="w-full bg-transparent border-none text-white px-4 py-3 focus:outline-none text-sm resize-none"></textarea>
+                </div>
+                <button type="submit" class="w-full py-3 rounded-xl bg-gray-900 hover:bg-gray-800 text-white font-bold text-xs uppercase border border-gray-700">
+                    KIRIM PESAN 📧
+                </button>
+            </form>
+
+            <div class="mt-6 text-gray-500 text-xs">NO WATERMARK &copy; 2025 NANZZ</div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}?v=4"></script>
+</body>
+</html>
