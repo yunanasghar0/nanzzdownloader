@@ -1,0 +1,84 @@
+body, html {
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    background-color: #020202; color: white;
+    font-family: 'Segoe UI', sans-serif; overflow-x: hidden;
+}
+#particle-canvas {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
+}
+.glass-panel {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 242, 234, 0.3);
+    box-shadow: 0 0 30px rgba(0, 242, 234, 0.15);
+    border-radius: 20px;
+}
+.brand-title {
+    background: linear-gradient(to right, #00f2ea, #ff0050);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    text-shadow: 0 0 20px rgba(0, 242, 234, 0.3);
+}
+.neon-box {
+    background: rgba(0, 0, 0, 0.6); border: 1px solid #333; transition: 0.3s;
+}
+.neon-box:focus-within { border-color: #00f2ea; box-shadow: 0 0 10px rgba(0,242,234,0.3); }
+.btn-cyber {
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
+    color: white; border: none; transition: 0.3s;
+}
+.btn-cyber:hover { transform: translateY(-2px); box-shadow: 0 0 20px rgba(0,114,255,0.6); }
+.button-download-final {
+    display: block; width: 100%; padding: 15px;
+    background: linear-gradient(90deg, #00f2ea, #0080ff);
+    color: #000; font-weight: 800; text-align: center; border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,242,234,0.5); text-decoration: none;
+}
+.alert { padding: 10px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 10px; }
+.alert-success { background: rgba(0,255,0,0.2); color: #8fff8f; border: 1px solid green; }
+.alert-danger { background: rgba(255,0,0,0.2); color: #ff8f8f; border: 1px solid red; }
+.wa-float {
+    position: fixed; bottom: 20px; right: 20px;
+    background-color: #25d366; color: white;
+    width: 60px; height: 60px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    z-index: 100; transition: 0.3s;
+}
+.wa-float:hover { transform: scale(1.1); }
+
+/* --- BRAND COLORS (WARNA ASLI APK) --- */
+
+/* TikTok: Putih dengan Glitch Cyan & Merah */
+.brand-tiktok {
+    color: #ffffff;
+    filter: drop-shadow(2px 2px 0px #ff0050) drop-shadow(-2px -2px 0px #00f2ea);
+    transition: transform 0.3s;
+}
+.brand-tiktok:hover { transform: scale(1.2); }
+
+/* YouTube: Merah Khas */
+.brand-youtube {
+    color: #FF0000;
+    filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.5));
+    transition: transform 0.3s;
+}
+.brand-youtube:hover { transform: scale(1.2); }
+
+/* Facebook: Biru Khas */
+.brand-facebook {
+    color: #1877F2;
+    filter: drop-shadow(0 0 10px rgba(24, 119, 242, 0.5));
+    transition: transform 0.3s;
+}
+.brand-facebook:hover { transform: scale(1.2); }
+
+/* Instagram: Gradasi Asli (Teknik CSS Background Clip) */
+.brand-instagram {
+    background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent; /* Text jadi transparan biar background gradasi kelihatan */
+    filter: drop-shadow(0 0 5px rgba(214, 36, 159, 0.3));
+    transition: transform 0.3s;
+}
+.brand-instagram:hover { transform: scale(1.2); }
